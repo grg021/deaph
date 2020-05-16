@@ -5,7 +5,7 @@
 
         <q-toolbar-title class="text-center">
           <q-icon name="event" />
-          DEA
+          {{ company.name }}
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'MainLayout',
   data () {
@@ -34,6 +35,23 @@ export default {
         }
       ]
     }
+  },
+  props: ['cslug'],
+  computed: {
+    ...mapGetters(['company'])
+  },
+  created () {
+    this.$q.loading.show()
+  },
+  mounted () {
+    this.$store.dispatch('company/getData', this.cslug)
+      .then(() => {
+        this.$q.loading.hide()
+      })
+      .catch(() => {
+        this.$q.loading.hide()
+        this.$router.push('/')
+      })
   }
 }
 </script>

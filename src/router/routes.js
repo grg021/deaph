@@ -2,26 +2,19 @@
 const routes = [
   {
     path: '/',
+    props: true,
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
         name: 'index',
-        path: '',
+        path: ':cslug',
+        props: true,
         component: () => import('pages/Index.vue')
       },
       {
-        name: 'retrieve',
-        path: 'retrieve',
-        component: () => import('pages/Retrieve.vue')
-      },
-      {
-        name: 'verify',
-        path: 'verify',
-        component: () => import('pages/Verify.vue')
-      },
-      {
         name: 'booking',
-        path: 'booking',
+        path: ':cslug/booking',
+        props: true,
         component: () => import('pages/Booking.vue')
       }
     ]

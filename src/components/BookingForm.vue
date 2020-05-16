@@ -163,7 +163,7 @@ export default {
         this.handleVerify()
       }
       if (this.step === 3) {
-        this.$router.push({ name: 'booking' })
+        this.$router.push({ name: 'booking', props: { cslug: this.$store.getters.cslug } })
       }
       this.$refs.stepper.next()
     },

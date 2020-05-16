@@ -24,7 +24,7 @@
         <div class="text-center q-gutter-md">
       <q-btn size="lg" color="primary" label="Retrieve" @click="handleRetrieve"></q-btn>
           <br/>
-      <q-btn color="grey-8" label="Back to Booking" outline @click="$router.push({ 'name': 'index' })" />
+      <q-btn color="grey-8" label="Back to Booking" outline @click="$router.push({ name: 'index', props: { cslug: this.$store.getters.cslug } })" />
         </div>
       </div>
     </div>
