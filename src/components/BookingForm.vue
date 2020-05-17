@@ -21,26 +21,41 @@
           <template v-slot:append>
             <q-icon name="event" class="cursor-pointer">
               <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                <q-date v-model="appointment.date" @input="() => $refs.qDateProxy.hide()" />
+                <q-date v-model="appointment.date"
+                        @input="() => $refs.qDateProxy.hide()" />
               </q-popup-proxy>
             </q-icon>
           </template>
         </q-input>
+        <q-select filled
+                  label="Branch"
+                  v-model="appointment.branch"
+                  :options="branches"
+                  :option-value="(item) => item === null ? null : item.id"
+                  :option-label="(item) => item === null ? null : item.name"
+        >
+          <template v-slot:prepend>
+            <q-icon name="store" />
+          </template>
+        </q-select>
         <q-select
           filled
+          label="Time"
           v-model="appointment.timeslot"
-          :options="options"
-          :option-value="opt => Object(opt) === opt && 'id' in opt ? opt.id : null"
-          :option-label="opt => Object(opt) === opt && 'desc' in opt ? opt.desc : '- Null -'"
-          :option-disable="opt => Object(opt) === opt ? opt.inactive === true : true"
-          emit-value
-          map-options
-          style="min-width: 250px; max-width: 300px"
+          :options="timeslots"
+          :option-value="opt => Object(opt) === opt && 'time' in opt ? opt.time : null"
+          :option-label="opt => Object(opt) === opt && 'time' in opt ? opt.time : ''"
+          :option-disable="opt => Object(opt) === opt ? opt.available !== true : true"
+          v-if="timeslots.length"
         >
-          <template v-slot:append>
+          <template v-slot:prepend>
             <q-icon name="schedule" />
           </template>
         </q-select>
+        <q-banner v-else inline-actions class="bg-orange text-white">
+          <q-icon name="info" />
+          No availability. Please try another date.
+        </q-banner>
       </div>
     </q-step>
 
@@ -87,6 +102,7 @@
     </q-step>
 
     <template v-slot:navigation>
+      <q-separator class="q-mb-md" />
       <q-stepper-navigation>
         <q-btn @click="nextStep()" color="primary" :label="step === 3 ? 'Finish' : 'Continue'" />
         <q-btn v-if="step > 1" flat color="primary" @click="$refs.stepper.previous()" label="Back" class="q-ml-sm" />
@@ -114,7 +130,7 @@
 
 <script>
 import { UtilityMixin } from '../mixins/UtilityMixin'
-
+import { mapGetters } from 'vuex'
 export default {
   name: 'BookingForm',
   mixins: [UtilityMixin],
@@ -126,37 +142,35 @@ export default {
         name: '',
         contact: '',
         branch: '',
-        timeslot: '9:00a',
+        timeslot: '',
         contact_type: 'sms',
         code: '',
         pin: ''
-      },
-      options: [
-        {
-          id: '9:00a',
-          desc: '9:00a'
-        },
-        {
-          id: '10:00a',
-          desc: '10:00a'
-        },
-        {
-          id: '11:00a',
-          desc: '11:00a'
-        },
-        {
-          id: '12:00p',
-          desc: '12:00p'
-        },
-        {
-          id: '1:00p',
-          desc: '1:00p',
-          inactive: true
-        }
-      ]
+      }
+    }
+  },
+  computed: {
+    ...mapGetters({
+      branches: 'company/getBranches',
+      timeslots: 'company/getTimeSlots'
+    }),
+    sel_date () {
+      return this.appointment.date
+    },
+    sel_branch () {
+      return this.appointment.branch
     }
   },
   methods: {
+    updateTimeSlots () {
+      const params = {
+        params: {
+          branch_id: this.appointment.branch.id,
+          date: this.appointment.date
+        }
+      }
+      this.$store.dispatch('company/getTimeSlots', params)
+    },
     nextStep () {
       this.scrollToElement('step_1')
       if (this.step === 2) {
@@ -174,6 +188,18 @@ export default {
         progress: true,
         message: 'Verification code sent.'
       })
+    }
+  },
+  watch: {
+    sel_date: {
+      handler (val) {
+        this.updateTimeSlots()
+      }
+    },
+    sel_branch: {
+      handler (val) {
+        this.updateTimeSlots()
+      }
     }
   }
 }
