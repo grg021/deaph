@@ -20,6 +20,9 @@ const mutations = {
 }
 
 const actions = {
+  resetTimeslots ({ commit }) {
+    commit('SET_TIMESLOTS', [])
+  },
   getData ({ commit }, slug) {
     return new Promise((resolve, reject) => {
       Company.getCompanyWithTransactions(slug)

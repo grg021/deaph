@@ -387,8 +387,14 @@ export default {
       }
     }
   },
+  mounted () {
+    if (this.branches.length === 1) {
+      this.appointment.branch = this.branches[0]
+    }
+  },
   beforeDestroy () {
     this.timeout = null
+    this.$store.dispatch('company/resetTimeslots')
   }
 }
 </script>
