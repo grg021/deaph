@@ -212,6 +212,9 @@ export default {
   },
   methods: {
     updateTimeSlots () {
+      if (this.appointment.branch === '' || this.appointment.date === '') {
+        return false
+      }
       const params = {
         params: {
           branch_id: this.appointment.branch.id,
@@ -367,12 +370,6 @@ export default {
         })
     }
   },
-  mounted () {
-    if (this.branches.length === 1) {
-      this.appointment.branch = this.branches[0]
-      this.updateTimeSlots()
-    }
-  },
   watch: {
     sel_date: {
       handler (val) {
@@ -382,6 +379,11 @@ export default {
     sel_branch: {
       handler (val) {
         this.updateTimeSlots()
+      }
+    },
+    branches () {
+      if (this.branches.length === 1) {
+        this.appointment.branch = this.branches[0]
       }
     }
   },

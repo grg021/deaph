@@ -15,7 +15,7 @@
       <div class="text-center q-pa-md">
         Powered by<br/>
         <a href="https://dghsolution.com" target="_blank">
-        <q-img src="statics/logo_transparent_sm.png" width="140px" />
+        <q-img src="statics/logo_white.png" width="250px" />
         </a>
       </div>
     </q-page-container>
@@ -43,7 +43,7 @@ export default {
   computed: {
     ...mapGetters(['company'])
   },
-  mounted () {
+  created () {
     if (this.cslug) {
       this.$q.loading.show()
       this.$store.dispatch('company/getData', this.cslug)
