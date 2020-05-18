@@ -13,7 +13,10 @@
     <q-page-container>
       <router-view />
       <div class="text-center q-pa-md">
-        Powered by <a href="https://dghsolution.com" target="_blank">DGHSolution</a>
+        Powered by<br/>
+        <a href="https://dghsolution.com" target="_blank">
+        <q-img src="statics/logo_transparent_sm.png" width="140px" />
+        </a>
       </div>
     </q-page-container>
   </q-layout>
@@ -40,18 +43,18 @@ export default {
   computed: {
     ...mapGetters(['company'])
   },
-  created () {
-    this.$q.loading.show()
-  },
   mounted () {
-    this.$store.dispatch('company/getData', this.cslug)
-      .then(() => {
-        this.$q.loading.hide()
-      })
-      .catch(() => {
-        this.$q.loading.hide()
-        this.$router.push('/')
-      })
+    if (this.cslug) {
+      this.$q.loading.show()
+      this.$store.dispatch('company/getData', this.cslug)
+        .then(() => {
+          this.$q.loading.hide()
+        })
+        .catch(() => {
+          this.$q.loading.hide()
+          this.$router.push('/')
+        })
+    }
   }
 }
 </script>
