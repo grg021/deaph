@@ -75,7 +75,7 @@ module.exports = configure(function (ctx) {
           SITEKEY: '6LeFCvcUAAAAABuFAvhanzQk7X-ubQnNYVmOQK3o'
         }
         : { // and on build (production):
-          API: JSON.stringify('https://dea.dghsolution.com'),
+          API: JSON.stringify('https://api.deaph.app'),
           SITEKEY: '6LeFCvcUAAAAABuFAvhanzQk7X-ubQnNYVmOQK3o'
         },
 
