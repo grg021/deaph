@@ -61,7 +61,7 @@
         </q-select>
         <q-banner v-else inline-actions class="bg-orange text-white">
           <q-icon name="info" />
-          No availability. Please try another date.
+          No availability. Check other date.
         </q-banner>
       </div>
     </q-step>
