@@ -15,9 +15,11 @@
     >
       <div class="q-gutter-md">
         <q-input filled bg-color="grey-2"
+                 ref="date"
                  v-model="appointment.date"
                  label="Pick a Date"
-                 mask="date" :rules="['date']">
+                 mask="date"
+                 :rules="['date', val => !!val || 'Please pick a date']">
           <template v-slot:append>
             <q-icon name="event" class="cursor-pointer">
               <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
@@ -29,6 +31,8 @@
         </q-input>
         <q-select filled
                   label="Branch"
+                  ref="branch"
+                  :rules="[val => !!val || 'Please select a branch']"
                   v-model="appointment.branch"
                   :options="branches"
                   :option-value="(item) => item === null ? null : item.id"
@@ -41,6 +45,9 @@
         <q-select
           filled
           label="Time"
+          ref="timeslot"
+          :rules="[val => !!val || 'Please pick a time']"
+          lazy-rules="ondemand"
           v-model="appointment.timeslot"
           :options="timeslots"
           :option-value="opt => Object(opt) === opt && 'time' in opt ? opt.time : null"
@@ -66,16 +73,29 @@
       :done="step > 2"
     >
       <div class="q-gutter-md">
-        <q-input label="Name" bg-color="grey-2" filled v-model="appointment.name">
+        <q-input label="Name"
+                 ref="cname"
+                 :rules="[val => !!val || 'Please enter name']"
+                 bg-color="grey-2"
+                 filled
+                 v-model="appointment.name">
           <template v-slot:prepend>
             <q-icon name="account_circle" />
           </template>
         </q-input>
         <q-input filled
                  type="tel"
+                 ref="sms"
+                 :rules="[
+                           val => !!val || 'Please enter a mobile no.',
+                           val => val.length === 10 || 'Please enter a valid mobile no.',
+                         ]"
+                 lazy-rules="ondemand"
+                 counter
+                 maxlength="10"
                  bg-color="grey-2"
-                 v-model="appointment.contact"
-                 prefix="+63" mask="### ### ####"
+                 v-model="appointment.sms"
+                 prefix="+63"
                  hint="The verification code will be sent to this number."
                  fill-mask>
         </q-input>
@@ -90,6 +110,12 @@
       <div class="q-gutter-lg">
         <q-input filled
                  label="Verification Code"
+                 ref="code"
+                 v-if="!appointment.is_trusted"
+                 :rules="[
+                   val => !!val || 'Please enter verification code',
+                   val => val.length === 6 || 'Please enter a valid code',
+                   ]"
                  bg-color="grey-2"
                  counter
                  maxlength="6"
@@ -104,7 +130,10 @@
     <template v-slot:navigation>
       <q-separator class="q-mb-md" />
       <q-stepper-navigation>
-        <q-btn @click="nextStep()" color="primary" :label="step === 3 ? 'Finish' : 'Continue'" />
+        <q-btn @click="nextStep()"
+               color="primary"
+               :loading="b_loading"
+               :label="step === 3 ? 'Finish' : 'Continue'" />
         <q-btn v-if="step > 1" flat color="primary" @click="$refs.stepper.previous()" label="Back" class="q-ml-sm" />
       </q-stepper-navigation>
     </template>
@@ -114,12 +143,12 @@
       </q-banner>
       <q-banner v-else-if="step === 2" class="text-dark bg-amber-1 q-px-lg">
         <div class="text-weight-medium text-h5">Contact Information</div>
-        <div class="text-body1">Wed, May 20, 2020 @ 9:00a</div>
+        <div class="text-body1"><span>{{ dateFormat(appointment.date) }}</span> @ <span>{{ appointment.timeslot.time }}</span></div>
       </q-banner>
       <q-banner v-else-if="step === 3" class="bg-cyan-1 text-dark q-px-lg">
         <div class="text-weight-medium text-h5">Verify Appointment</div>
-        <div class="text-body1">Wed, May 20, 2020 @ 9:00a</div>
-        <div class="text-body1">Greg Hermo (+639178070836)</div>
+        <div class="text-body1"><span>{{ dateFormat(appointment.date) }}</span> @ <span>{{ appointment.timeslot.time }}</span></div>
+        <div class="text-body1"><span>{{ appointment.name }}</span>&nbsp;<span>(+63 {{ appointment.sms }})</span></div>
       </q-banner>
       <q-banner v-else class="bg-blue-8 text-white q-px-lg">
         Contact Support
@@ -131,21 +160,26 @@
 <script>
 import { UtilityMixin } from '../mixins/UtilityMixin'
 import { mapGetters } from 'vuex'
+import Booking from '../apis/booking'
 export default {
   name: 'BookingForm',
   mixins: [UtilityMixin],
   data () {
     return {
+      b_loading: false,
       step: 1,
       appointment: {
         date: '2020/05/15',
         name: '',
-        contact: '',
+        sms: '',
         branch: '',
         timeslot: '',
-        contact_type: 'sms',
+        verify: 'sms',
         code: '',
-        pin: ''
+        pin: '',
+        g_token: '',
+        contact: '',
+        is_trusted: 0
       }
     }
   },
@@ -170,24 +204,126 @@ export default {
         }
       }
       this.$store.dispatch('company/getTimeSlots', params)
+        .then(() => {
+          this.appointment.timeslot = ''
+          this.$refs.timeslot.resetValidation()
+        })
     },
-    nextStep () {
+    async nextStep () {
       this.scrollToElement('step_1')
+      if (this.step === 1) {
+        this.$refs.date.validate()
+        this.$refs.branch.validate()
+        if (this.$refs.date.hasError || this.$refs.branch.hasError) {
+          return false
+        }
+        this.$refs.timeslot.validate()
+        if (this.$refs.timeslot.hasError) {
+          return false
+        }
+        this.$refs.stepper.next()
+        return false
+      }
       if (this.step === 2) {
-        this.handleVerify()
+        this.$refs.cname.validate()
+        this.$refs.sms.validate()
+        if (this.$refs.cname.hasError || this.$refs.sms.hasError) {
+          return false
+        }
+        this.b_loading = true
+        await this.$recaptchaLoaded()
+        this.appointment.g_token = await this.$recaptcha('verify')
+        Booking
+          .verify(this.appointment)
+          .then(res => {
+            const { data } = res.data
+            this.b_loading = false
+            this.appointment.contact = data.contact
+            this.appointment.is_trusted = data.is_trusted
+            this.$refs.stepper.next()
+            if (!data.is_trusted) {
+              this.$q.notify({
+                type: 'info',
+                position: 'top',
+                progress: true,
+                message: 'Verification code sent.'
+              })
+            }
+            return false
+          })
+          .catch(err => {
+            this.b_loading = false
+            if (err.response.status === 405 || err.response.status === 422) {
+              this.$q.notify({
+                type: 'negative',
+                icon: 'info',
+                position: 'top',
+                progress: true,
+                message: err.response.data.message
+              })
+            } else {
+              this.$q.notify({
+                type: 'negative',
+                icon: 'info',
+                position: 'top',
+                progress: true,
+                message: 'Something went wrong. Please contact support.'
+              })
+            }
+            return false
+          })
       }
       if (this.step === 3) {
-        this.$router.push({ name: 'booking', props: { cslug: this.$store.getters.cslug } })
+        if (!this.appointment.is_trusted) {
+          this.$refs.code.validate()
+          if (this.$refs.code.hasError) {
+            return false
+          }
+        } else {
+          this.appointment.code = 'TOKEN'
+        }
+        this.b_loading = true
+        await this.$recaptchaLoaded()
+        this.appointment.g_token = await this.$recaptcha('book')
+        Booking
+          .submit(this.appointment)
+          .then(res => {
+            this.$q.notify({
+              type: 'positive',
+              icon: 'info',
+              position: 'top',
+              progress: true,
+              message: 'Booking Submitted'
+            })
+            this.$router.push({
+              name: 'booking',
+              params: {
+                cslug: this.$store.getters['company/getSlug'],
+                uuid: res.data.data.uuid
+              }
+            })
+          })
+          .catch(err => {
+            this.b_loading = false
+            if (err.response.status === 405 || err.response.status === 422) {
+              this.$q.notify({
+                type: 'negative',
+                icon: 'info',
+                position: 'top',
+                progress: true,
+                message: err.response.data.message
+              })
+            } else {
+              this.$q.notify({
+                type: 'negative',
+                icon: 'info',
+                position: 'top',
+                progress: true,
+                message: 'Something went wrong. Please contact support.'
+              })
+            }
+          })
       }
-      this.$refs.stepper.next()
-    },
-    handleVerify () {
-      this.$q.notify({
-        type: 'info',
-        position: 'top',
-        progress: true,
-        message: 'Verification code sent.'
-      })
     }
   },
   watch: {

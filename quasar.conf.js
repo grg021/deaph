@@ -13,8 +13,8 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/cli-documentation/boot-files
     boot: [
-
-      'axios'
+      'axios',
+      'captcha'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -71,10 +71,12 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history', // available values: 'hash', 'history'
       env: ctx.dev
         ? { // so on dev we'll have
-          API: JSON.stringify('https://appointment.test')
+          API: JSON.stringify('https://appointment.test'),
+          SITEKEY: '6LeFCvcUAAAAABuFAvhanzQk7X-ubQnNYVmOQK3o'
         }
         : { // and on build (production):
-          API: JSON.stringify('https://dea.dghsolution.com')
+          API: JSON.stringify('https://dea.dghsolution.com'),
+          SITEKEY: '6LeFCvcUAAAAABuFAvhanzQk7X-ubQnNYVmOQK3o'
         },
 
       // rtl: false, // https://quasar.dev/options/rtl-support

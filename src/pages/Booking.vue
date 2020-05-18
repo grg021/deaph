@@ -4,19 +4,27 @@
       <div class="col-grow q-mx-sm q-my-md" style="max-width: 400px">
         <q-card flat bordered class="my-card">
           <q-card-section>
-            <div class="text-h6">LTO Calamba</div>
+            <div class="text-h6">{{ booking.branch_name }}</div>
           </q-card-section>
           <q-separator/>
           <q-card-section>
             <q-input outline label="BOOKING CODE"
                      hint="IMPORTANT Copy and Save this code."
-                     readonly v-model="appointment.pin">
+                     readonly v-model="booking.ref_num">
               <template v-slot:append>
                 <q-icon name="vpn_key" />
               </template>
             </q-input>
-            <div class="text-body1 q-my-sm q-mt-md">Wed, May 20, 2020<br/>9:00 am</div>
-            <div class="text-body1 q-my-sm">Greg Hermo<br/>+639178070836</div>
+            <div class="text-body1 q-my-sm q-mt-md">
+              <span>{{ booking.date }}</span>
+              <br/>
+              <span>{{ booking.time_slot_formatted }}</span>
+            </div>
+            <div class="text-body1 q-my-sm">
+              <span>{{ booking.name }}</span>
+              <br/>
+              <span>{{ booking.contact }}</span>
+            </div>
           </q-card-section>
           <q-separator />
           <q-card-actions>
@@ -35,8 +43,19 @@ import { UtilityMixin } from '../mixins/UtilityMixin'
 export default {
   name: 'Booking',
   mixins: [UtilityMixin],
+  props: ['uuid'],
   mounted () {
-    this.scrollToElement('step_0')
+    this.$q.loading.show()
+    this.$store.dispatch('booking/getBooking', this.uuid)
+      .then(() => {
+        this.$q.loading.hide()
+        this.scrollToElement('step_0')
+      })
+  },
+  computed: {
+    booking () {
+      return this.$store.state.booking.data
+    }
   },
   data () {
     return {

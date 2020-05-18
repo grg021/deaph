@@ -4,6 +4,7 @@ const routes = [
     path: '/',
     props: true,
     component: () => import('layouts/MainLayout.vue'),
+    name: 'main',
     children: [
       {
         name: 'index',
@@ -13,7 +14,7 @@ const routes = [
       },
       {
         name: 'booking',
-        path: ':cslug/booking',
+        path: ':cslug/booking/:uuid',
         props: true,
         component: () => import('pages/Booking.vue')
       }

@@ -2,7 +2,8 @@ import Company from '../../apis/company'
 
 const state = {
   data: {
-    branches: []
+    branches: [],
+    slug: ''
   },
   timeslots: []
 }
@@ -48,6 +49,9 @@ const getters = {
   },
   getTimeSlots: state => {
     return state.timeslots
+  },
+  getSlug: state => {
+    return state.data.slug
   }
 }
 
