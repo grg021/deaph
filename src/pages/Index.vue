@@ -15,7 +15,7 @@
     </div>
     <div id="step_1" class="fit row flex-center">
       <div class="col-grow" style="max-width: 400px">
-        <booking-form />
+        <booking-form :cslug="cslug" />
       </div>
     </div>
     <div id="step_2" class="row flex-center bg-green" style="height: 600px; width: 100%">
@@ -33,6 +33,7 @@ import RetrieveForm from 'components/RetrieveForm'
 export default {
   name: 'PageIndex',
   components: { RetrieveForm, BookingForm },
-  mixins: [UtilityMixin]
+  mixins: [UtilityMixin],
+  props: ['cslug']
 }
 </script>

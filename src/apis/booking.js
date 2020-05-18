@@ -12,5 +12,8 @@ export default {
   },
   submit (form) {
     return Request.post('/api/verify', form)
+  },
+  resend (form) {
+    return Request.post('/api/resend', form)
   }
 }

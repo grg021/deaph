@@ -30,6 +30,7 @@
           </template>
         </q-input>
         <q-select filled
+                  v-show="branches.length > 1"
                   label="Branch"
                   ref="branch"
                   :rules="[val => !!val || 'Please select a branch']"
@@ -107,11 +108,10 @@
       title="Verify"
       icon="verified_user"
     >
-      <div class="q-gutter-lg">
+      <div class="q-gutter-lg" v-if="!appointment.is_trusted">
         <q-input filled
                  label="Verification Code"
                  ref="code"
-                 v-if="!appointment.is_trusted"
                  :rules="[
                    val => !!val || 'Please enter verification code',
                    val => val.length === 6 || 'Please enter a valid code',
@@ -124,6 +124,14 @@
             <q-icon name="lock" />
           </template>
         </q-input>
+        <div>
+          Didn't receive the verification code?<br/>
+          <q-btn outline size="sm"
+                 label="Re-send SMS"
+                 @click="handleResend"
+                 :disable="!resend_enabled"
+                 :loading="b_loading"/>
+        </div>
       </div>
     </q-step>
 
@@ -161,15 +169,21 @@
 import { UtilityMixin } from '../mixins/UtilityMixin'
 import { mapGetters } from 'vuex'
 import Booking from '../apis/booking'
+import moment from 'moment'
 export default {
   name: 'BookingForm',
   mixins: [UtilityMixin],
+  props: ['cslug'],
   data () {
     return {
       b_loading: false,
       step: 1,
+      resend_enabled: false,
+      timeout: null,
       appointment: {
-        date: '2020/05/15',
+        id: 0,
+        cslug: this.cslug,
+        date: moment().add(1, 'day').format('YYYY/MM/DD'),
         name: '',
         sms: '',
         branch: '',
@@ -186,7 +200,8 @@ export default {
   computed: {
     ...mapGetters({
       branches: 'company/getBranches',
-      timeslots: 'company/getTimeSlots'
+      timeslots: 'company/getTimeSlots',
+      initBranch: 'company/getInitBranch'
     }),
     sel_date () {
       return this.appointment.date
@@ -239,6 +254,7 @@ export default {
             const { data } = res.data
             this.b_loading = false
             this.appointment.contact = data.contact
+            this.appointment.id = data.id
             this.appointment.is_trusted = data.is_trusted
             this.$refs.stepper.next()
             if (!data.is_trusted) {
@@ -248,6 +264,10 @@ export default {
                 progress: true,
                 message: 'Verification code sent.'
               })
+              const self = this
+              this.timeout = setTimeout(function () {
+                self.resend_enabled = true
+              }, 30000)
             }
             return false
           })
@@ -324,6 +344,33 @@ export default {
             }
           })
       }
+    },
+    async handleResend () {
+      await this.$recaptchaLoaded()
+      this.appointment.g_token = await this.$recaptcha('resend')
+      this.b_loading = true
+      Booking
+        .resend(this.appointment)
+        .then(() => {
+          this.b_loading = false
+          this.$q.notify({
+            type: 'info',
+            position: 'top',
+            progress: true,
+            message: 'Verification code sent.'
+          })
+          this.resend_enabled = false
+          const self = this
+          this.timeout = setTimeout(function () {
+            self.resend_enabled = true
+          }, 30000)
+        })
+    }
+  },
+  mounted () {
+    if (this.branches.length === 1) {
+      this.appointment.branch = this.branches[0]
+      this.updateTimeSlots()
     }
   },
   watch: {
@@ -337,6 +384,9 @@ export default {
         this.updateTimeSlots()
       }
     }
+  },
+  beforeDestroy () {
+    this.timeout = null
   }
 }
 </script>

@@ -2,7 +2,9 @@ import Company from '../../apis/company'
 
 const state = {
   data: {
-    branches: [],
+    branches: {
+      data: []
+    },
     slug: ''
   },
   timeslots: []
@@ -52,6 +54,9 @@ const getters = {
   },
   getSlug: state => {
     return state.data.slug
+  },
+  getInitBranch: state => {
+    return (state.data.branches.data.length === 1) ? state.data.branches.data[0] : ''
   }
 }
 
