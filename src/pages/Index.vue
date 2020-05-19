@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex">
+  <div>
     <div id="step_0" class="row flex-center bg-blue" style="height: 600px; width: 100%">
       <div class="col-grow text-center">
         <q-btn unelevated
@@ -23,7 +23,7 @@
         <retrieve-form />
       </div>
     </div>
-  </q-page>
+  </div>
 </template>
 
 <script>

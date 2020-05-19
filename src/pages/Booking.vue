@@ -1,6 +1,6 @@
 <template>
-  <q-page class="flex" id="top">
-    <div id="step_0" class="row justify-center bg-cyan-1" style="min-height: 400px; width: 100%">
+
+    <div id="step_0" class="row justify-center bg-cyan-1" style="width: 100%">
       <div class="col-grow q-mx-sm q-my-md" style="max-width: 400px">
         <q-card flat bordered class="my-card">
           <q-card-section>
@@ -35,7 +35,7 @@
         </q-card>
       </div>
     </div>
-  </q-page>
+
 </template>
 
 <script>

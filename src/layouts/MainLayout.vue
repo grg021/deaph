@@ -2,22 +2,23 @@
   <q-layout view="lHh Lpr lFf">
     <q-header bordered class="bg-white text-primary">
       <q-toolbar>
-
         <q-toolbar-title class="text-center">
-          <q-icon name="event" />
+          <q-icon name="store" />
           {{ company.name }}
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
     <q-page-container>
+      <q-page id="top">
       <router-view />
-      <div class="text-center q-pa-md">
-        Powered by<br/>
-        <a href="https://dghsolution.com" target="_blank">
-        <q-img src="statics/logo_transparent.png" width="250px" />
-        </a>
-      </div>
+        <div class="text-center q-pa-md">
+          Powered by<br/>
+          <a href="https://dghsolution.com" target="_blank">
+            <q-img src="statics/logo_transparent.png" width="250px" />
+          </a>
+        </div>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
