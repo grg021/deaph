@@ -70,24 +70,7 @@ export default {
             }
           })
         })
-        .catch(err => {
-          if (err.response.status === 404 || err.response.status === 422) {
-            this.$q.notify({
-              type: 'negative',
-              icon: 'info',
-              position: 'top',
-              progress: true,
-              message: err.response.data.message
-            })
-          } else {
-            this.$q.notify({
-              type: 'negative',
-              icon: 'info',
-              position: 'top',
-              progress: true,
-              message: 'Something went wrong. Please contact support.'
-            })
-          }
+        .catch(() => {
           this.b_loading = false
         })
     }
