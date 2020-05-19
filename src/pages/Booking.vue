@@ -27,8 +27,8 @@
             </div>
           </q-card-section>
           <q-separator />
-          <q-card-actions>
-            <q-btn color="negative" flat>Cancel</q-btn>
+          <q-card-actions align="center">
+            <q-btn color="negative" flat @click="handleCancel">Cancel</q-btn>
             <q-btn color="primary" flat>Reschedule</q-btn>
             <q-btn flat @click="$router.push({ name: 'index' })">Home</q-btn>
           </q-card-actions>
@@ -40,6 +40,7 @@
 
 <script>
 import { UtilityMixin } from '../mixins/UtilityMixin'
+import Booking from '../apis/booking'
 export default {
   name: 'Booking',
   mixins: [UtilityMixin],
@@ -60,8 +61,33 @@ export default {
   data () {
     return {
       appointment: {
-        pin: '1234'
+        uuid: this.uuid,
+        g_token: ''
       }
+    }
+  },
+  methods: {
+    handleCancel () {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Would you like to cancel this booking?',
+        cancel: true,
+        persistent: true
+      }).onOk(this.cancel)
+    },
+    async cancel () {
+      await this.$recaptchaLoaded()
+      this.appointment.g_token = await this.$recaptcha('cancel')
+      Booking
+        .cancel(this.appointment)
+        .then(res => {
+          this.$q.notify({
+            type: 'positive',
+            position: 'top',
+            progress: true,
+            message: res.data.message
+          })
+        })
     }
   }
 }
