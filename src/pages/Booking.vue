@@ -1,10 +1,14 @@
 <template>
 
     <div id="step_0" class="row justify-center bg-cyan-1" style="width: 100%">
-      <div class="col-grow q-mx-sm q-my-md" style="max-width: 400px">
+      <div class="col-grow q-mx-sm q-my-md" style="max-width: 400px; width:100%">
         <q-card flat bordered class="my-card">
           <q-card-section>
-            <div class="text-h6">{{ booking.branch_name }}</div>
+            <div class="row no-wrap items-center">
+              <div>
+                {{ booking.branch_name }}
+              </div>
+            </div>
           </q-card-section>
           <q-separator/>
           <q-card-section>
@@ -29,7 +33,7 @@
           <q-separator />
           <q-card-actions align="center">
             <q-btn color="negative" flat @click="handleCancel">Cancel</q-btn>
-            <q-btn color="primary" flat>Reschedule</q-btn>
+            <q-btn color="primary" flat @click="handleReschedule">Reschedule</q-btn>
             <q-btn flat @click="$router.push({ name: 'index' })">Home</q-btn>
           </q-card-actions>
         </q-card>
@@ -41,17 +45,13 @@
 <script>
 import { UtilityMixin } from '../mixins/UtilityMixin'
 import Booking from '../apis/booking'
+import RescheduleForm from '../components/RescheduleForm'
 export default {
   name: 'Booking',
   mixins: [UtilityMixin],
   props: ['uuid'],
   mounted () {
-    this.$q.loading.show()
-    this.$store.dispatch('booking/getBooking', this.uuid)
-      .then(() => {
-        this.$q.loading.hide()
-        this.scrollToElement('step_0')
-      })
+    this.loadBooking()
   },
   computed: {
     booking () {
@@ -67,6 +67,30 @@ export default {
     }
   },
   methods: {
+
+    loadBooking () {
+      this.$q.loading.show()
+      this.$store.dispatch('booking/getBooking', this.uuid)
+        .then(() => {
+          this.$q.loading.hide()
+          this.scrollToElement('step_0')
+        })
+        .catch(err => {
+          if (err.response.status === 404) {
+            this.$router.push({ name: 'index' })
+          }
+        })
+    },
+
+    handleReschedule () {
+      this.$q.dialog({
+        component: RescheduleForm,
+        parent: this,
+        booking: this.booking
+      }).onOk(() => {
+        this.loadBooking()
+      })
+    },
     handleCancel () {
       this.$q.dialog({
         title: 'Confirm',

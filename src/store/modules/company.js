@@ -39,7 +39,7 @@ const actions = {
       Company.getTimeSlots(params)
         .then(res => {
           commit('SET_TIMESLOTS', res.data.time_slots)
-          resolve(res.data.data)
+          resolve(res.data)
         }).catch(error => {
           commit('SET_TIMESLOTS', [])
           reject(error)

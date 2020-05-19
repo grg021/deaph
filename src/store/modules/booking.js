@@ -18,6 +18,15 @@ const actions = {
         reject(error)
       })
     })
+  },
+  rescheduleBooking ({ commit, dispatch }, param) {
+    return new Promise((resolve, reject) => {
+      Booking.reschedule(param).then(res => {
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
   }
 }
 const getters = {}

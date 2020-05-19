@@ -249,8 +249,14 @@ export default {
           return false
         }
         this.b_loading = true
-        await this.$recaptchaLoaded()
-        this.appointment.g_token = await this.$recaptcha('verify')
+        try {
+          await this.$recaptchaLoaded()
+          this.appointment.g_token = await this.$recaptcha('verify')
+        } catch (e) {
+          this.b_loading = false
+          return false
+        }
+
         Booking
           .verify(this.appointment)
           .then(res => {

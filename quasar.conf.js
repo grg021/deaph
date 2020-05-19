@@ -14,7 +14,8 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/cli-documentation/boot-files
     boot: [
       'axios',
-      'captcha'
+      'captcha',
+      'permission'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

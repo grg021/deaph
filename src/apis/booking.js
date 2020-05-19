@@ -18,5 +18,8 @@ export default {
   },
   cancel (form) {
     return Request.post('/api/booking/cancel', form)
+  },
+  reschedule (form) {
+    return Request.post('/api/booking/reschedule', form)
   }
 }
