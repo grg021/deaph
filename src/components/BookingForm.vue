@@ -274,25 +274,8 @@ export default {
             }
             return false
           })
-          .catch(err => {
+          .catch(() => {
             this.b_loading = false
-            if (err.response.status === 405 || err.response.status === 422) {
-              this.$q.notify({
-                type: 'negative',
-                icon: 'info',
-                position: 'top',
-                progress: true,
-                message: err.response.data.message
-              })
-            } else {
-              this.$q.notify({
-                type: 'negative',
-                icon: 'info',
-                position: 'top',
-                progress: true,
-                message: 'Something went wrong. Please contact support.'
-              })
-            }
             return false
           })
       }
@@ -326,25 +309,8 @@ export default {
               }
             })
           })
-          .catch(err => {
+          .catch(() => {
             this.b_loading = false
-            if (err.response.status === 405 || err.response.status === 422) {
-              this.$q.notify({
-                type: 'negative',
-                icon: 'info',
-                position: 'top',
-                progress: true,
-                message: err.response.data.message
-              })
-            } else {
-              this.$q.notify({
-                type: 'negative',
-                icon: 'info',
-                position: 'top',
-                progress: true,
-                message: 'Something went wrong. Please contact support.'
-              })
-            }
           })
       }
     },
