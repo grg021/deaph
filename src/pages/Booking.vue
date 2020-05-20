@@ -46,14 +46,22 @@
 import { UtilityMixin } from '../mixins/UtilityMixin'
 import Booking from '../apis/booking'
 import RescheduleForm from '../components/RescheduleForm'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Booking',
   mixins: [UtilityMixin],
   props: ['uuid'],
+  meta () {
+    return {
+      title: this.company.name,
+      titleTemplate: title => `${title} | DEA`
+    }
+  },
   mounted () {
     this.loadBooking()
   },
   computed: {
+    ...mapGetters(['company']),
     booking () {
       return this.$store.state.booking.data
     }

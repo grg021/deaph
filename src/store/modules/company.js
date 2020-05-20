@@ -7,12 +7,16 @@ const state = {
     },
     slug: ''
   },
+  branches: [],
   timeslots: []
 }
 
 const mutations = {
   SET_DATA: (state, data) => {
     state.data = data
+  },
+  SET_BRANCHES: (state, data) => {
+    state.branches = data
   },
   SET_TIMESLOTS: (state, data) => {
     state.timeslots = data
@@ -28,6 +32,17 @@ const actions = {
       Company.getCompanyWithTransactions(slug)
         .then(res => {
           commit('SET_DATA', res.data.data)
+          resolve(res.data.data)
+        }).catch(error => {
+          reject(error)
+        })
+    })
+  },
+  getBranches ({ commit }, slug) {
+    return new Promise((resolve, reject) => {
+      Company.getBranches(slug)
+        .then(res => {
+          commit('SET_BRANCHES', res.data.data)
           resolve(res.data.data)
         }).catch(error => {
           reject(error)
@@ -50,6 +65,9 @@ const actions = {
 
 const getters = {
   getBranches: state => {
+    return state.branches
+  },
+  branches: state => {
     return state.data.branches.data
   },
   getTimeSlots: state => {

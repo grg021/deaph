@@ -2,7 +2,7 @@
   "name": "dea",
   "version": "0.0.1",
   "description": "Digital Express Appointments",
-  "productName": "DEA App",
+  "productName": "DEA",
   "cordovaId": "org.cordova.quasar.app",
   "capacitorId": "",
   "author": "Greg Hermo <greg.hermo@gmail.com>",

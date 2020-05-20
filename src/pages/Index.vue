@@ -30,10 +30,20 @@
 import { UtilityMixin } from '../mixins/UtilityMixin'
 import BookingForm from 'components/BookingForm'
 import RetrieveForm from 'components/RetrieveForm'
+import { mapGetters } from 'vuex'
 export default {
   name: 'PageIndex',
   components: { RetrieveForm, BookingForm },
   mixins: [UtilityMixin],
-  props: ['cslug']
+  props: ['cslug'],
+  computed: {
+    ...mapGetters(['company'])
+  },
+  meta () {
+    return {
+      title: this.company.name,
+      titleTemplate: title => `${title} | DEA`
+    }
+  }
 }
 </script>

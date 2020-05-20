@@ -3,7 +3,7 @@ import { Notify } from 'quasar'
 
 const request = axios.create({
   baseURL: process.env.API,
-  timeout: 5000
+  timeout: 10000
 })
 
 request.interceptors.response.use(

@@ -7,6 +7,7 @@
              type="tel"
              ref="contact"
              maxlength="10"
+             lazy-rules="ondemand"
              :rules="[
                            val => !!val || 'Please enter a mobile no.',
                            val => val.length === 10 || 'Please enter a valid mobile no.',
@@ -19,6 +20,7 @@
     <q-input bg-color="white"
              v-model="retrieve.code"
              ref="code"
+             lazy-rules="ondemand"
              :rules="[val => !!val || 'Please enter booking no.',]"
              filled :type="isPwd ? 'password' : 'text'"
              label="Booking Code">
