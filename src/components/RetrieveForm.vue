@@ -1,6 +1,6 @@
 <template>
   <div class="q-gutter-lg">
-    <div class="text-h4">Retrieve Booking</div>
+    <div class="text-h4">Manage Booking</div>
     <q-input filled
              label="Mobile No."
              bg-color="white"
