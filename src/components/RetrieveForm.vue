@@ -32,7 +32,7 @@
         />
       </template>
     </q-input>
-    <q-btn size="lg" :loading="b_loading" color="primary" label="Retrieve" @click="handleRetrieve"></q-btn>
+    <q-btn size="lg" :loading="b_loading" color="primary" label="Continue" @click="handleRetrieve"></q-btn>
   </div>
 </template>
 

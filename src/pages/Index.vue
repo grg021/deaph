@@ -10,7 +10,7 @@
         <q-btn outline
                color="white"
                @click="scrollToElement('step_2')"
-               label="Retrieve existing Booking" />
+               label="Manage existing Booking" />
       </div>
     </div>
     <div id="step_1" class="fit row flex-center">
