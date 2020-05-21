@@ -63,7 +63,7 @@ export default {
               icon: 'info',
               position: 'top',
               progress: true,
-              message: 'Booking Submitted'
+              message: res.data.message
             })
             this.$router.push({
               name: 'booking',

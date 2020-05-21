@@ -21,6 +21,9 @@
             </q-input>
             <div class="text-body1 q-my-sm q-mt-md">
               <span>{{ booking.date }}</span>
+              <q-chip class="float-right" square :color="colorStatus" text-color="white">
+                {{ booking.status }}
+              </q-chip>
               <br/>
               <span>{{ booking.time_slot_formatted }}</span>
             </div>
@@ -64,6 +67,18 @@ export default {
     ...mapGetters(['company']),
     booking () {
       return this.$store.state.booking.data
+    },
+    colorStatus () {
+      switch (this.booking.status) {
+        case 'RESERVED':
+          return 'orange'
+        case 'BOOKED':
+          return 'blue'
+        case 'NOSHOW':
+          return 'red'
+        default:
+          return 'green'
+      }
     }
   },
   data () {
