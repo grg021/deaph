@@ -18,7 +18,6 @@
     </q-select>
     <q-input filled bg-color="grey-2"
              ref="date"
-             v-if="opt_dates.length"
              v-model="appointment.date"
              label="Pick a Date"
              mask="date"
@@ -31,6 +30,7 @@
         <q-icon name="event" class="cursor-pointer">
           <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
             <q-date v-model="cal_date"
+                    today-btn
                     emit-immediately
                     :options="opt_dates"
                     @input="handleInput" />
