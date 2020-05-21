@@ -9,5 +9,8 @@ export default {
   },
   getTimeSlots (params) {
     return Request.get('/api/get-time-slots', params)
+  },
+  getOpenDates (params) {
+    return Request.get('/api/get-open-dates', params)
   }
 }

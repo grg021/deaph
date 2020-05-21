@@ -8,7 +8,8 @@ const state = {
     slug: ''
   },
   branches: [],
-  timeslots: []
+  timeslots: [],
+  open_dates: []
 }
 
 const mutations = {
@@ -20,6 +21,9 @@ const mutations = {
   },
   SET_TIMESLOTS: (state, data) => {
     state.timeslots = data
+  },
+  SET_OPEN_DATES: (state, data) => {
+    state.open_dates = data
   }
 }
 
@@ -57,6 +61,18 @@ const actions = {
           resolve(res.data)
         }).catch(error => {
           commit('SET_TIMESLOTS', [])
+          reject(error)
+        })
+    })
+  },
+  getOpenDates ({ commit, state }, params) {
+    return new Promise((resolve, reject) => {
+      Company.getOpenDates(params)
+        .then(res => {
+          commit('SET_OPEN_DATES', res.data.open_days)
+          resolve(res.data)
+        }).catch(error => {
+          commit('SET_OPEN_DATES', [])
           reject(error)
         })
     })

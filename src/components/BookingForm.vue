@@ -13,7 +13,15 @@
       icon="event"
       :done="step > 1"
     >
-      <booking-form-one :app="appointment" :cslug="cslug" ref="form_one" v-if="branches.length" />
+      <booking-form-one
+        :app="appointment"
+        :cslug="cslug"
+        :sel_branch="sel_branch"
+        :opt_dates="open_dates"
+        @cdate="handleChangeDate"
+        @cbranch="handleChangeBranch"
+        ref="form_one"
+        v-if="branches.length" />
     </q-step>
 
     <q-step
@@ -72,12 +80,11 @@ import { UtilityMixin } from '../mixins/UtilityMixin'
 import BookingFormOne from 'components/BookingFormOne'
 import BookingFormTwo from 'components/BookingFormTwo'
 import BookingFormThree from 'components/BookingFormThree'
-import moment from 'moment'
 const getDefaultAppointment = (slug) => {
   return {
     id: 0,
     cslug: slug,
-    date: moment().add(1, 'day').format('YYYY/MM/DD'),
+    date: '',
     name: '',
     sms: '',
     branch: '',
@@ -98,7 +105,9 @@ export default {
   data () {
     return {
       step: 1,
-      appointment: getDefaultAppointment(this.cslug)
+      appointment: getDefaultAppointment(this.cslug),
+      sel_branch: '',
+      open_dates: []
     }
   },
   computed: {
@@ -115,9 +124,38 @@ export default {
         this.appointment = val
       },
       deep: true
+    },
+    branches (val) {
+      if (val.length === 1) {
+        this.sel_branch = val[0]
+        const d = new Date()
+        this.getOpenDates(d.getFullYear(), d.getMonth() + 1, d.getDay(), val[0].id)
+      }
     }
   },
   methods: {
+    handleChangeBranch (e) {
+      const d = new Date()
+      this.getOpenDates(d.getFullYear(), d.getMonth() + 1, d.getDay(), e.id)
+      this.sel_branch = e
+    },
+    handleChangeDate (e) {
+      this.getOpenDates(e.year, e.month, e.day, e.branch_id)
+    },
+    getOpenDates (year, month, day, id) {
+      const params = {
+        params: {
+          branch_id: id,
+          year: year,
+          month: month,
+          day: day
+        }
+      }
+      this.$store.dispatch('company/getOpenDates', params)
+        .then(res => {
+          this.open_dates = res.open_days
+        })
+    },
     nextStep () {
       this.scrollToElement('step_1')
       if (this.step === 1) {
@@ -143,6 +181,9 @@ export default {
         this.$refs.form_three.submit()
       }
     }
+  },
+  beforeDestroy () {
+    this.$store.dispatch('company/resetTimeslots')
   }
 }
 </script>

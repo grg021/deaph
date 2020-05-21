@@ -1,24 +1,8 @@
 <template>
   <div class="q-gutter-md">
-    <q-input filled bg-color="grey-2"
-             ref="date"
-             v-model="appointment.date"
-             label="Pick a Date"
-             mask="date"
-             :rules="['date', val => !!val || 'Please pick a date']">
-      <template v-slot:append>
-        <q-icon name="event" class="cursor-pointer">
-          <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-            <q-date v-model="appointment.date"
-                    @input="handleInput" />
-          </q-popup-proxy>
-        </q-icon>
-      </template>
-    </q-input>
     <q-select filled
-              v-if="branches.length"
               v-show="branches.length > 1"
-              @input="updateTimeSlots"
+              @input="handleBranchUpdate"
               label="Branch"
               ref="branch"
               lazy-rules="ondemand"
@@ -32,6 +16,28 @@
         <q-icon name="store" />
       </template>
     </q-select>
+    <q-input filled bg-color="grey-2"
+             ref="date"
+             v-if="opt_dates.length"
+             v-model="appointment.date"
+             label="Pick a Date"
+             mask="date"
+             readonly
+             :disable="appointment.branch === ''"
+             lazy-rules="ondemand"
+             @click="() => $refs.qDateProxy.show()"
+             :rules="['date', val => !!val || 'Please pick a date']">
+      <template v-slot:prepend>
+        <q-icon name="event" class="cursor-pointer">
+          <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+            <q-date v-model="cal_date"
+                    emit-immediately
+                    :options="opt_dates"
+                    @input="handleInput" />
+          </q-popup-proxy>
+        </q-icon>
+      </template>
+    </q-input>
     <q-select
       filled
       label="Time"
@@ -49,7 +55,10 @@
         <q-icon name="schedule" />
       </template>
     </q-select>
-    <q-banner v-else inline-actions class="bg-orange text-white">
+    <q-banner v-if="timeslots.length === 0 && opt_dates.length > 0 && appointment.date !== ''"
+              inline-actions
+              class="bg-orange
+              text-white">
       <q-icon name="info" />
       No availability. Check other date.
     </q-banner>
@@ -62,10 +71,11 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'BookingFormOne',
-  props: ['cslug', 'app'],
+  props: ['cslug', 'app', 'sel_branch', 'opt_dates'],
   data () {
     return {
-      appointment: new Appointment()
+      appointment: new Appointment(),
+      cal_date: ''
     }
   },
   computed: {
@@ -83,13 +93,27 @@ export default {
     handleInput (value, reason, details) {
       if (reason === 'day') {
         this.$refs.qDateProxy.hide()
+        this.appointment.date = value
         this.updateTimeSlots()
+      } else {
+        this.appointment.cal_date = ''
+        details.branch_id = this.appointment.branch.id
+        this.$emit('cdate', details)
       }
     },
+    handleBranchUpdate (e) {
+      this.$emit('cbranch', e)
+      this.appointment.date = ''
+      this.appointment.cal_date = ''
+      this.$store.dispatch('company/resetTimeslots')
+    },
     validate () {
-      this.$refs.date.validate()
       this.$refs.branch.validate()
-      if (this.$refs.date.hasError || this.$refs.branch.hasError) {
+      if (this.$refs.branch.hasError) {
+        return false
+      }
+      this.$refs.date.validate()
+      if (this.$refs.date.hasError) {
         return false
       }
       this.$refs.timeslot.validate()
@@ -111,20 +135,15 @@ export default {
       }
       this.$store.dispatch('company/getTimeSlots', params)
         .then(() => {
-          this.$store.commit('booking/SET_TIMESLOT', '')
+          this.appointment.timeslot = ''
           this.$refs.timeslot.resetValidation()
         })
     }
   },
   mounted () {
     this.appointment = new Appointment(this.app)
-    if (this.branches.length === 1) {
-      this.appointment.branch = this.branches[0]
-      this.updateTimeSlots()
-    }
-  },
-  beforeDestroy () {
-    this.$store.dispatch('company/resetTimeslots')
+    this.cal_date = this.appointment.date
+    this.appointment.branch = this.sel_branch
   }
 }
 </script>
