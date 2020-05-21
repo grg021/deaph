@@ -16,7 +16,7 @@
         <q-icon name="lock" />
       </template>
     </q-input>
-    <div class="text-right">
+    <div class="text-right text-caption">
       Didn't receive the verification code?<br/>
       <q-btn outline size="sm"
              label="Re-send SMS"

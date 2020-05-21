@@ -14,17 +14,14 @@
     <q-input filled
              type="tel"
              ref="sms"
-             :rules="[
-                           val => !!val || 'Please enter a mobile no.',
-                           val => val.length === 10 || 'Please enter a valid mobile no.',
-                         ]"
+             :rules="[val => isValidMobileNumber(val) || 'Please enter a valid mobile no.']"
              lazy-rules="ondemand"
              counter
              maxlength="10"
              bg-color="grey-2"
-             v-model="appointment.sms"
+             v-model.number="appointment.sms"
+             placeholder="(917) 807 0836"
              prefix="+63"
-             hint="The verification code will be sent to this number."
              fill-mask>
     </q-input>
   </div>
@@ -33,7 +30,7 @@
 <script>
 import { Appointment } from 'src/forms/Appointment'
 import Booking from 'src/apis/booking'
-
+import { parsePhoneNumber } from 'libphonenumber-js/mobile'
 export default {
   name: 'BookingFormTwo',
   props: ['app'],
@@ -46,6 +43,11 @@ export default {
     this.appointment = new Appointment(this.app)
   },
   methods: {
+    isValidMobileNumber (sms) {
+      const number = '63' + sms
+      const phoneNumber = parsePhoneNumber(number, 'PH')
+      return phoneNumber.isValid()
+    },
     validate () {
       this.$refs.cname.validate()
       this.$refs.sms.validate()
