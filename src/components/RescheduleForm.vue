@@ -96,7 +96,7 @@ export default {
         this.updateTimeSlots()
       } else {
         this.cal_date = ''
-        details.branch_id = this.booking.branch.id
+        details.branch_id = this.booking.branch_id
         this.getOpenDates(details.year, details.month, details.day, details.branch_id)
       }
     },
