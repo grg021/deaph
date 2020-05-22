@@ -40,16 +40,21 @@
 import Booking from '../apis/booking'
 export default {
   name: 'RetrieveForm',
+  props: ['cslug'],
   data () {
     return {
       retrieve: {
         contact: '',
         code: '',
-        g_token: ''
+        g_token: '',
+        cslug: ''
       },
       isPwd: true,
       b_loading: false
     }
+  },
+  mounted () {
+    this.retrieve.cslug = this.cslug
   },
   methods: {
     async handleRetrieve () {

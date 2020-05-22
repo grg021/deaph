@@ -20,7 +20,7 @@
     </div>
     <div id="step_2" class="row flex-center bg-green" style="height: 600px; width: 100%">
       <div class="col-grow text-center q-pa-md" style="max-width: 400px">
-        <retrieve-form />
+        <retrieve-form :cslug="cslug" />
       </div>
     </div>
   </div>
