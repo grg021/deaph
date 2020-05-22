@@ -7,12 +7,16 @@
                  v-model="appointment.date"
                  label="Pick a Date"
                  mask="date"
+                 readonly
+                 @click="() => $refs.qDateProxy.show()"
                  :rules="['date', val => !!val || 'Please pick a date']">
           <template v-slot:append>
             <q-icon name="event" class="cursor-pointer">
               <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                <q-date v-model="appointment.date"
+                <q-date v-model="cal_date"
+                        today-btn
                         emit-immediately
+                        :options="opt_dates"
                         @input="handleInput" />
               </q-popup-proxy>
             </q-icon>
@@ -49,7 +53,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { mapGetters } from 'vuex'
 export default {
   name: 'RescheduleForm',
@@ -69,22 +72,47 @@ export default {
       }
     }
   },
+  mounted () {
+    const d = new Date()
+    this.getOpenDates(d.getFullYear(), d.getMonth() + 1, d.getDay(), this.booking.id)
+  },
   data () {
     return {
       appointment: {
         id: this.booking.id,
-        date: moment().add(1, 'day').format('YYYY/MM/DD'),
+        date: '',
         timeslot: '',
         g_token: ''
       },
-      cal_opts: []
+      cal_date: '',
+      opt_dates: []
     }
   },
   methods: {
     handleInput (value, reason, details) {
       if (reason === 'day') {
         this.$refs.qDateProxy.hide()
+        this.appointment.date = value
+        this.updateTimeSlots()
+      } else {
+        this.cal_date = ''
+        details.branch_id = this.appointment.branch.id
+        this.getOpenDates(details.year, details.month, details.day, details.branch_id)
       }
+    },
+    getOpenDates (year, month, day, id) {
+      const params = {
+        params: {
+          branch_id: id,
+          year: year,
+          month: month,
+          day: day
+        }
+      }
+      this.$store.dispatch('company/getOpenDates', params)
+        .then(res => {
+          this.opt_dates = res.open_days
+        })
     },
     show () {
       this.$refs.dialog.show()
