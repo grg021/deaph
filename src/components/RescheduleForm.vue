@@ -74,7 +74,7 @@ export default {
   },
   mounted () {
     const d = new Date()
-    this.getOpenDates(d.getFullYear(), d.getMonth() + 1, d.getDay(), this.booking.id)
+    this.getOpenDates(d.getFullYear(), d.getMonth() + 1, d.getDay(), this.booking.branch_id)
   },
   data () {
     return {
@@ -96,8 +96,7 @@ export default {
         this.updateTimeSlots()
       } else {
         this.cal_date = ''
-        details.branch_id = this.booking.branch_id
-        this.getOpenDates(details.year, details.month, details.day, details.branch_id)
+        this.getOpenDates(details.year, details.month, details.day, this.booking.branch_id)
       }
     },
     getOpenDates (year, month, day, id) {
