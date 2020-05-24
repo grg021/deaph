@@ -2,6 +2,11 @@
   <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <div class="q-pa-md">
+        <q-banner class="bg-orange text-white q-mb-md"
+                  v-if="!branch.is_auto_approved"
+                  rounded>
+          New Date and Time will be subject to approval.
+        </q-banner>
         <q-input filled bg-color="grey-2"
                  ref="date"
                  v-model="appointment.date"
@@ -39,7 +44,7 @@
             <q-icon name="schedule" />
           </template>
         </q-select>
-        <q-banner v-else inline-actions class="bg-orange text-white">
+        <q-banner v-if="timeslots.length === 0 && opt_dates.length > 0 && appointment.date !== ''" inline-actions class="bg-orange text-white">
           <q-icon name="info" />
           No availability. Check other date.
         </q-banner>
@@ -63,6 +68,9 @@ export default {
     }),
     sel_date () {
       return this.appointment.date
+    },
+    branch () {
+      return this.booking.branch.data
     }
   },
   watch: {
