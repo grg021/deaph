@@ -30,7 +30,7 @@
       icon="account_circle"
       :done="step > 2"
     >
-      <booking-form-two :app="appointment" ref="form_two" />
+      <booking-form-two :app="appointment" :branch="sel_branch" ref="form_two" />
     </q-step>
 
     <q-step
@@ -80,6 +80,7 @@ import { UtilityMixin } from '../mixins/UtilityMixin'
 import BookingFormOne from 'components/BookingFormOne'
 import BookingFormTwo from 'components/BookingFormTwo'
 import BookingFormThree from 'components/BookingFormThree'
+import QuestionForm from 'components/QuestionForm'
 const getDefaultAppointment = (slug) => {
   return {
     id: 0,
@@ -169,9 +170,22 @@ export default {
         if (!this.$refs.form_two.validate()) {
           return false
         }
-        this.$refs.form_two.submit().then(() => {
-          this.$refs.stepper.next()
-        })
+        if (this.sel_branch.forms.data.length && this.sel_branch.forms.data.findIndex(d => d.id === '1')) {
+          this.$q.dialog({
+            component: QuestionForm,
+            parent: this
+          }).onOk(() => {
+            this.$refs.form_two.submit()
+              .then(() => {
+                this.$refs.stepper.next()
+              })
+          })
+          return false
+        }
+        this.$refs.form_two.submit()
+          .then(() => {
+            this.$refs.stepper.next()
+          })
         return false
       }
       if (this.step === 3) {

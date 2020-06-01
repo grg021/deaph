@@ -2,7 +2,7 @@ import Request from './request'
 
 export default {
   getCompanyWithTransactions (company) {
-    return Request.get(`/api/company/${company}?include=branches`)
+    return Request.get(`/api/company/${company}?include=branches.forms`)
   },
   getBranches (slug) {
     return Request.get(`/api/company/${slug}/branches`)
