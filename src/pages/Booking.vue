@@ -35,8 +35,8 @@
           </q-card-section>
           <q-separator />
           <q-card-actions align="center">
-            <q-btn color="negative" flat @click="handleCancel">Cancel</q-btn>
-            <q-btn color="primary" flat @click="handleReschedule">Reschedule</q-btn>
+            <q-btn color="negative" flat @click="handleCancel" v-if="allow_cancel">Cancel</q-btn>
+            <q-btn color="primary" flat @click="handleReschedule" v-if="allow_reschedule">Reschedule</q-btn>
             <q-btn flat @click="$router.push({ name: 'index' })">Home</q-btn>
           </q-card-actions>
         </q-card>
@@ -67,6 +67,16 @@ export default {
     ...mapGetters(['company']),
     booking () {
       return this.$store.state.booking.data
+    },
+    allow_cancel () {
+      return this.booking.branch.data.allow_cancel &&
+        (this.booking.status === 'BOOKED' ||
+          this.booking.status === 'RESERVED')
+    },
+    allow_reschedule () {
+      return this.booking.branch.data.allow_reschedule &&
+        (this.booking.status === 'BOOKED' ||
+          this.booking.status === 'RESERVED')
     },
     colorStatus () {
       switch (this.booking.status) {
